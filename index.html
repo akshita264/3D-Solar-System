@@ -1,17 +1,27 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>3D Solar System</title>
-    <link rel="stylesheet" href="/style.css" />
-  </head>
-  <body>
-    <div id="controlPanel">
-      <button id="toggleAnimation">Pause</button>
-      <div id="sliders"></div>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>3D Solar System</title>
+  <link rel="stylesheet" href="./style.css" />
+</head>
+<body>
+  <div id="sliders"></div>
+
+  <div id="tooltip"></div>
+
+  <div id="planetInfo" class="hidden">
+    <div class="dialog-box">
+      <h2 id="planetName"></h2>
+      <p><strong>Temperature:</strong> <span id="planetTemp"></span></p>
+      <p><strong>Moons:</strong> <span id="planetMoons"></span></p>
+      <button id="closeInfo">Close</button>
     </div>
-    <div class="tooltip" id="tooltip"></div>
-    <script type="module" src="./src/main.js"></script>
-  </body>
+  </div>
+
+  <button id="toggleAnimation">Pause</button>
+
+  <script type="module" src="./src/main.js"></script>
+</body>
 </html>
