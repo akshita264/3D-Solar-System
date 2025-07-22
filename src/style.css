@@ -81,11 +81,15 @@ canvas {
 
 #toggleAnimation {
   position: absolute;
+  width: 100px;
+  height: 40px;
+  font-size: 1.25rem;
   top: 10px;
   right: 10px;
   z-index: 2;
-  background: #222;
-  color: white;
+  background: #e98e32;
+  color: black;
+  font-weight: bold;
   padding: 8px 14px;
   border-radius: 8px;
   cursor: pointer;

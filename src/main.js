@@ -34,14 +34,14 @@ document.addEventListener('DOMContentLoaded', () => {
   scene.add(light);
 
   const planetData = [
-    { name: "Mercury", color: '#909090', size: 0.4, distance: 7, moons: 0, temp: "167°C" },
-    { name: "Venus", color: '#D4AF37', size: 0.9, distance: 10, moons: 0, temp: "464°C" },
-    { name: "Earth", color:'#1E90FF', size: 1, distance: 13, moons: 1, temp: "15°C" },
-    { name: "Mars", color: '#B22222', size: 0.8, distance: 16, moons: 2, temp: "-65°C" },
-    { name: "Jupiter", color: '#D2B48C', size: 2.5, distance: 20, moons: 79, temp: "-110°C" },
-    { name: "Saturn", color: '#F5DEB3', size: 2.2, distance: 25, moons: 83, temp: "-140°C" },
-    { name: "Uranus", color: '#40E0D0', size: 1.7, distance: 30, moons: 27, temp: "-195°C" },
-    { name: "Neptune", color: '#000080', size: 1.6, distance: 35, moons: 14, temp: "-200°C" },
+    { name: "Mercury", color: '#909090', size: 0.4, distance: 7, moons: 0, temp: "167°C", diameter: 4879, rotationPeriod: "58.6 days" },
+    { name: "Venus", color: '#D4AF37', size: 0.9, distance: 10, moons: 0, temp: "464°C", diameter: 12104, rotationPeriod: "243 days" },
+    { name: "Earth", color:'#1E90FF', size: 1, distance: 13, moons: 1, temp: "15°C", diameter: 12742, rotationPeriod: "24 hours" },
+    { name: "Mars", color: '#B22222', size: 0.8, distance: 16, moons: 2, temp: "-65°C", diameter: 6779, rotationPeriod: "24.6 hours" },
+    { name: "Jupiter", color: '#D2B48C', size: 2.5, distance: 20, moons: 79, temp: "-110°C", diameter: 139820, rotationPeriod: "9.9 hours" },
+    { name: "Saturn", color: '#F5DEB3', size: 2.2, distance: 25, moons: 83, temp: "-140°C", diameter: 116460, rotationPeriod: "10.7 hours" },
+    { name: "Uranus", color: '#40E0D0', size: 1.7, distance: 30, moons: 27, temp: "-195°C", diameter: 50724, rotationPeriod: "17.2 hours" },
+    { name: "Neptune", color: '#000080', size: 1.6, distance: 35, moons: 14, temp: "-200°C", diameter: 49244, rotationPeriod: "16.1 hours"},
   ];
 
   const planets = [];
@@ -127,6 +127,8 @@ window.addEventListener("click", () => {
     document.getElementById("planetName").textContent = planet.name;
     document.getElementById("planetTemp").textContent = planet.temp;
     document.getElementById("planetMoons").textContent = planet.moons;
+    document.getElementById("planetDiameter").textContent = planet.diameter + " km";
+    document.getElementById("planetRotation").textContent = planet.rotationPeriod;
     
     document.getElementById("planetInfo").classList.remove("hidden");
   }
@@ -136,7 +138,24 @@ document.getElementById("closeInfo").addEventListener("click", () => {
   document.getElementById("planetInfo").classList.add("hidden");
 });
 
-
+  // Saturn's RINGS
+  let ringMesh = null;
+  if (planetData.name === "Saturn") {
+    const ringGeometry = new THREE.RingGeometry(
+      planetData.size * 1.3, // inner radius
+      planetData.size * 2.2, // outer radius
+      64
+    );
+    const ringMaterial = new THREE.MeshBasicMaterial({
+      color: 0xcccccc,
+      side: THREE.DoubleSide,
+      transparent: true,
+      opacity: 0.6,
+    });
+    ringMesh = new THREE.Mesh(ringGeometry, ringMaterial);
+    ringMesh.rotation.x = Math.PI / 2;
+    mesh.add(ringMesh); // Attach rings to Saturn
+  }
 
   window.addEventListener("resize", () => {
     camera.aspect = window.innerWidth / window.innerHeight;
@@ -155,6 +174,10 @@ document.getElementById("closeInfo").addEventListener("click", () => {
 
         mesh.position.x = planetData[i].distance * Math.cos(angle);
         mesh.position.z = planetData[i].distance * Math.sin(angle);
+
+          if (name === "Saturn" && ringMesh) {
+          ringMesh.rotation.z += 0.001; // Slight ring rotation
+  }
       });
     }
 
