@@ -2,7 +2,6 @@ import './style.css';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
-
 //Creating the scene and camera
 document.addEventListener('DOMContentLoaded', () => {
   const scene = new THREE.Scene();
@@ -89,8 +88,10 @@ document.addEventListener('DOMContentLoaded', () => {
       mesh.add(saturnRing);
     }
 
-    planets.push({ mesh, distance: planet.distance });
     orbitSpeeds[planet.name] = 0.01 + index * 0.002;
+
+    // <-- CHANGE HERE: add angle property initialized to 0 for each planet -->
+    planets.push({ mesh, distance: planet.distance, angle: 0 });
 
     const sliderContainer = document.createElement("div");
     sliderContainer.className = "slider-container";
@@ -174,13 +175,21 @@ document.addEventListener('DOMContentLoaded', () => {
     requestAnimationFrame(animate);
 
     if (!isPaused) {
-      planets.forEach(({ mesh }, i) => {
+      planets.forEach(({ mesh, distance }, i) => {
         const name = planetData[i].name;
         const speed = orbitSpeeds[name];
-        const angle = speed * Date.now() * 0.001;
 
-        mesh.position.x = planetData[i].distance * Math.cos(angle);
-        mesh.position.z = planetData[i].distance * Math.sin(angle);
+        // <-- CHANGE HERE: increment angle instead of calculating from Date.now() -->
+        planets[i].angle += speed;
+
+        // Keep angle in range 0 to 2*PI (optional)
+        if (planets[i].angle > Math.PI * 2) {
+          planets[i].angle -= Math.PI * 2;
+        }
+
+        // Update position based on incremental angle
+        mesh.position.x = distance * Math.cos(planets[i].angle);
+        mesh.position.z = distance * Math.sin(planets[i].angle);
       });
     }
 
