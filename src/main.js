@@ -90,7 +90,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     orbitSpeeds[planet.name] = 0.01 + index * 0.002;
 
-    // <-- CHANGE HERE: add angle property initialized to 0 for each planet -->
+    // Speed slider for each planet
     planets.push({ mesh, distance: planet.distance, angle: 0 });
 
     const sliderContainer = document.createElement("div");
@@ -178,11 +178,9 @@ document.addEventListener('DOMContentLoaded', () => {
       planets.forEach(({ mesh, distance }, i) => {
         const name = planetData[i].name;
         const speed = orbitSpeeds[name];
-
-        // <-- CHANGE HERE: increment angle instead of calculating from Date.now() -->
+        // Increment angle based on speed
         planets[i].angle += speed;
 
-        // Keep angle in range 0 to 2*PI (optional)
         if (planets[i].angle > Math.PI * 2) {
           planets[i].angle -= Math.PI * 2;
         }
