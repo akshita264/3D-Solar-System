@@ -2,6 +2,8 @@ import './style.css';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
+
+//Creating the scene and camera
 document.addEventListener('DOMContentLoaded', () => {
   const scene = new THREE.Scene();
   scene.fog = new THREE.Fog(0x000000, 50, 300);
@@ -14,6 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
   );
   camera.position.z = 50;
 
+  // used to display the scene
   const renderer = new THREE.WebGLRenderer({ antialias: true });
   renderer.setSize(window.innerWidth, window.innerHeight);
   document.body.appendChild(renderer.domElement);
@@ -22,20 +25,23 @@ document.addEventListener('DOMContentLoaded', () => {
   const tooltip = document.getElementById("tooltip");
   const infoBox = document.getElementById("planetInfo");
 
+  // Sun
   const sun = new THREE.Mesh(
     new THREE.SphereGeometry(4, 64, 64),
     new THREE.MeshBasicMaterial({ color: '#FFD700' })
   );
   scene.add(sun);
 
-  scene.add(new THREE.AmbientLight(0x404040, 1.2));
-  const light = new THREE.PointLight(0xffffff, 3, 10000);
+  // Lights
+  scene.add(new THREE.AmbientLight(0xffffff, 2));
+  const light = new THREE.PointLight(0xffffff, 6, 10000);
   light.position.set(0, 0, 0);
   scene.add(light);
 
+  // Planet information which is to be displayed in the info box
   const planetData = [
     { name: "Mercury", color: '#909090', size: 0.4, distance: 7, moons: 0, temp: "167°C", diameter: 4879, rotationPeriod: "58.6 days" },
-    { name: "Venus", color: '#D4AF37', size: 0.9, distance: 10, moons: 0, temp: "464°C", diameter: 12104, rotationPeriod: "243 days" },
+    { name: "Venus", color: '#a8941fff', size: 0.9, distance: 10, moons: 0, temp: "464°C", diameter: 12104, rotationPeriod: "243 days" },
     { name: "Earth", color:'#1E90FF', size: 1, distance: 13, moons: 1, temp: "15°C", diameter: 12742, rotationPeriod: "24 hours" },
     { name: "Mars", color: '#B22222', size: 0.8, distance: 16, moons: 2, temp: "-65°C", diameter: 6779, rotationPeriod: "24.6 hours" },
     { name: "Jupiter", color: '#D2B48C', size: 2.5, distance: 20, moons: 79, temp: "-110°C", diameter: 139820, rotationPeriod: "9.9 hours" },
@@ -47,6 +53,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const planets = [];
   const orbitSpeeds = {};
 
+  // Create planets and their orbits
   planetData.forEach((planet, index) => {
     const mesh = new THREE.Mesh(
       new THREE.SphereGeometry(planet.size, 32, 32),
@@ -56,12 +63,31 @@ document.addEventListener('DOMContentLoaded', () => {
     mesh.userData = planet;
     scene.add(mesh);
 
-    const ring = new THREE.Mesh(
+    // Orbit ring around the sun
+    const orbitRing = new THREE.Mesh(
       new THREE.RingGeometry(planet.distance - 0.05, planet.distance + 0.05, 64),
       new THREE.MeshBasicMaterial({ color: 0xffffff, side: THREE.DoubleSide })
     );
-    ring.rotation.x = Math.PI / 2;
-    scene.add(ring);
+    orbitRing.rotation.x = Math.PI / 2;
+    scene.add(orbitRing);
+
+    // Saturn's visible ring
+    if (planet.name === "Saturn") {
+      const saturnRingGeometry = new THREE.RingGeometry(
+        planet.size * 1.3,
+        planet.size * 2.2,
+        64
+      );
+      const saturnRingMaterial = new THREE.MeshBasicMaterial({
+        color: 0xcccccc,
+        side: THREE.DoubleSide,
+        transparent: true,
+        opacity: 0.6
+      });
+      const saturnRing = new THREE.Mesh(saturnRingGeometry, saturnRingMaterial);
+      saturnRing.rotation.x = Math.PI / 2;
+      mesh.add(saturnRing);
+    }
 
     planets.push({ mesh, distance: planet.distance });
     orbitSpeeds[planet.name] = 0.01 + index * 0.002;
@@ -91,9 +117,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const starVertices = [];
   for (let i = 0; i < 3000; i++) {
     starVertices.push(
-      (Math.random() - 0.5) * 800,
-      (Math.random() - 0.5) * 800,
-      (Math.random() - 0.5) * 800
+      (Math.random() - 0.5) * 700,
+      (Math.random() - 0.5) * 700,
+      (Math.random() - 0.5) * 700
     );
   }
   starsGeometry.setAttribute("position", new THREE.Float32BufferAttribute(starVertices, 3));
@@ -117,45 +143,26 @@ document.addEventListener('DOMContentLoaded', () => {
     mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
   });
 
-window.addEventListener("click", () => {
-  raycaster.setFromCamera(mouse, camera);
-  const intersects = raycaster.intersectObjects(planets.map(p => p.mesh));
+  window.addEventListener("click", () => {
+    raycaster.setFromCamera(mouse, camera);
+    const intersects = raycaster.intersectObjects(planets.map(p => p.mesh));
 
-  if (intersects.length > 0) {
-    const planet = intersects[0].object.userData;
+    if (intersects.length > 0) {
+      const planet = intersects[0].object.userData;
 
-    document.getElementById("planetName").textContent = planet.name;
-    document.getElementById("planetTemp").textContent = planet.temp;
-    document.getElementById("planetMoons").textContent = planet.moons;
-    document.getElementById("planetDiameter").textContent = planet.diameter + " km";
-    document.getElementById("planetRotation").textContent = planet.rotationPeriod;
-    
-    document.getElementById("planetInfo").classList.remove("hidden");
-  }
-});
+      document.getElementById("planetName").textContent = planet.name;
+      document.getElementById("planetTemp").textContent = planet.temp;
+      document.getElementById("planetMoons").textContent = planet.moons;
+      document.getElementById("planetDiameter").textContent = planet.diameter + " km";
+      document.getElementById("planetRotation").textContent = planet.rotationPeriod;
 
-document.getElementById("closeInfo").addEventListener("click", () => {
-  document.getElementById("planetInfo").classList.add("hidden");
-});
+      document.getElementById("planetInfo").classList.remove("hidden");
+    }
+  });
 
-  // Saturn's RINGS
-  let ringMesh = null;
-  if (planetData.name === "Saturn") {
-    const ringGeometry = new THREE.RingGeometry(
-      planetData.size * 1.3, // inner radius
-      planetData.size * 2.2, // outer radius
-      64
-    );
-    const ringMaterial = new THREE.MeshBasicMaterial({
-      color: 0xcccccc,
-      side: THREE.DoubleSide,
-      transparent: true,
-      opacity: 0.6,
-    });
-    ringMesh = new THREE.Mesh(ringGeometry, ringMaterial);
-    ringMesh.rotation.x = Math.PI / 2;
-    mesh.add(ringMesh); // Attach rings to Saturn
-  }
+  document.getElementById("closeInfo").addEventListener("click", () => {
+    document.getElementById("planetInfo").classList.add("hidden");
+  });
 
   window.addEventListener("resize", () => {
     camera.aspect = window.innerWidth / window.innerHeight;
@@ -174,10 +181,6 @@ document.getElementById("closeInfo").addEventListener("click", () => {
 
         mesh.position.x = planetData[i].distance * Math.cos(angle);
         mesh.position.z = planetData[i].distance * Math.sin(angle);
-
-          if (name === "Saturn" && ringMesh) {
-          ringMesh.rotation.z += 0.001; // Slight ring rotation
-  }
       });
     }
 
@@ -199,5 +202,3 @@ document.getElementById("closeInfo").addEventListener("click", () => {
 
   animate();
 });
-
-
